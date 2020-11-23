@@ -1,0 +1,55 @@
+# graph creation pseudo - code
+
+average_human_speed = 5
+max_walk_time = 15
+
+stops_label_dict = {}
+
+# 1 etap - zrobienie labeli id_przystanku -> indeks macierzy 
+
+1. for counter, stop in enumerate(all_stops):
+	1.1 stops_label_dict[stop] = counter
+
+cost_matrix = x = np.full((counter, counter, 2), [0, 'public transport'])
+	
+# 2 etap - dodanie czasu przejazdów wszystkimi liniami do macierzy kosztów
+
+2.0 pobierz datę odjazu podana przez użytkownika na stronie
+2.1 dla każdego rozkładu z rozkłady_jazdy.json(data):
+	2.1.1 dla każdego przystanku z rozkładu:
+		2.1.2 time = nastepny_przystanek.arrival_time - przystanek.arrival_time
+			  cost_matrix[stops_label_dict[przystanek]][stops_label_dict[nastepny_przystanek]][0] = time
+
+# 3 etap - dodanie "przejść pieszych" do macierz kosztów
+
+3. Dla przystanek1 z przystanki:
+	3.1 dla przystanek2 z przystanki:
+		3.2 if cost_matrix[stops_label_dict[przystanek1]][stops_label_dict[przystanek2]][0] == 0:
+			3.3 distance = sqrt((przystanek1.x - przystanek2.x)^2 + (przystanek1.y - przystanek2.y)^2)
+				time = distance/average_human_speed
+				if time < max_walk_time:
+					cost_matrix[stops_label_dict[przystanek1]][stops_label_dict[przystanek2]][0] = time
+					cost_matrix[stops_label_dict[przystanek1]][stops_label_dict[przystanek2]][1] = 'walk'
+					
+# 4 etap - dodanie czasu oczekiwania w miejscach, w których czekamy na przesiadkę
+
+4.0 pobierz ze strony czas odjazdu podany przez użytkownika (departure_time)
+
+
+in AC0():
+
+	(...)
+	was_walking = False
+	while node != end:
+		if was_walking:
+			dla kazdego z kolejnych mozliwych dalszych połaczen:
+				# sprawdz aktualna godzine i ile czasu do odjazdu z tego przystanku dla każdej lini - > potem dodaj ten czas do macierzy 
+				# kosztów.
+		was_walking = False
+		(...)
+		# finding the next node having probability higher then random number (r)
+		node = np.nonzero(cumulative_probabilities > r)[0][0] + 1
+		if cost_matrix[prev_node][node][1] == 'walk':
+			was_walking = True
+			# w nastepnej iteracji sprawdz aktualna godzine i ile czasu do odjazdu z tego przystanku dla każdej lini - > potem dodaj ten  # czas do macierzy kosztów.
+			
