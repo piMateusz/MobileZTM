@@ -1,37 +1,35 @@
 import numpy as np
-from numpy import inf
 
-START = 1
-END = 6
-
-cost_matrix = np.array([[0, 2, 0, 2, 0, 0],
-                        [0, 0, 3, 0, 0, 0],
-                        [0, 0, 0, 0, 0, 4],
-                        [0, 0, 0, 0, 4, 0],
-                        [0, 0, 0, 0, 0, 2],
-                        [0, 0, 0, 0, 0, 0]])
-
-
-iteration = 100
-ants = 6
-nodes = 6
+# START = 1
+# END = 6
+#
+# cost_matrix = np.array([[0, 2, 0, 2, 0, 0],
+#                         [0, 0, 3, 0, 0, 0],
+#                         [0, 0, 0, 0, 0, 4],
+#                         [0, 0, 0, 0, 4, 0],
+#                         [0, 0, 0, 0, 0, 2],
+#                         [0, 0, 0, 0, 0, 0]])
+#
+# cost_matrix = np.ones((6, 6))
+# iteration = 100
+# ants = 6
+# nodes = 6
+#
+# ants = nodes = 6
 
 # initialization part
 
-e = .5        # evaporation rate
-alpha = 1     # pheromone factor
-beta = 2      # visibility factor
+# e = .5        # evaporation rate
+# alpha = 1     # pheromone factor
+# beta = 2      # visibility factor
 
 # calculating the visibility of the next city visibility(i,j) = 1/cost_matrix(i,j)
 
-# FIXME
-#  fix RuntimeWarning: divide by zero encountered in true_divide
-
-visibility = 1/cost_matrix
-visibility[visibility == inf] = 0
+# visibility = 1/cost_matrix
+# visibility[visibility == inf] = 0
 
 
-def aco_algorithm(num_iteration, start, end):
+def aco_algorithm(num_iteration, start, end, ants, nodes, visibility, cost_matrix, e, alpha, beta):
     # initializing pheromone present at the paths to the cities
 
     pheromone = .1 * np.ones((ants, nodes))
@@ -41,7 +39,7 @@ def aco_algorithm(num_iteration, start, end):
     dist_min_cost = 0
 
     for ite in range(num_iteration):
-
+        print(f"{ite} iteration")
         # initial starting position of every ants
         route = [start]
 
@@ -108,12 +106,12 @@ def aco_algorithm(num_iteration, start, end):
     return route_dict, best_route, dist_min_cost
 
 
-if __name__ == "__main__":
-    final_route_dict, final_best_route, final_dist_min_cost = aco_algorithm(iteration, START, END)
-
-    print(f"finding path from {START} to {END}")
-    print('route of all the ants at the end :')
-    for key_ in final_route_dict:
-        print(f"{key_}: {final_route_dict[key_]}")
-    print('best path :', final_best_route)
-    print('cost of the best path', int(final_dist_min_cost[0]) + cost_matrix[int(final_best_route[-2]) - 1, 0])
+# if __name__ == "__main__":
+#     final_route_dict, final_best_route, final_dist_min_cost = aco_algorithm(iteration, START, END)
+#
+#     print(f"finding path from {START} to {END}")
+#     print('route of all the ants at the end :')
+#     for key_ in final_route_dict:
+#         print(f"{key_}: {final_route_dict[key_]}")
+#     print('best path :', final_best_route)
+#     print('cost of the best path', int(final_dist_min_cost[0]) + cost_matrix[int(final_best_route[-2]) - 1, 0])

@@ -1,3 +1,6 @@
+TODO ! LISTA TRAS (WARIANTÓW) DLA DANEJ LINII ??
+
+
 # graph creation pseudo - code
 
 average_human_speed = 5
