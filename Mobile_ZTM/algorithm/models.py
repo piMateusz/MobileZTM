@@ -29,7 +29,7 @@ class Timetable(models.Model):
     stop = models.ForeignKey(Stop, on_delete=models.CASCADE)
     route = models.ForeignKey(Route, on_delete=models.CASCADE)
     stopSequence = models.IntegerField()
-    arrivalTime = models.DateField()
+    arrivalTime = models.DateTimeField()
     date = models.DateField()
     busServiceName = models.CharField(max_length=10)
     order = models.IntegerField()

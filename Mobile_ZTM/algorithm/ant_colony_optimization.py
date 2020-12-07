@@ -1,37 +1,20 @@
 import numpy as np
 
-# START = 1
-# END = 6
-#
-# cost_matrix = np.array([[0, 2, 0, 2, 0, 0],
-#                         [0, 0, 3, 0, 0, 0],
-#                         [0, 0, 0, 0, 0, 4],
-#                         [0, 0, 0, 0, 4, 0],
-#                         [0, 0, 0, 0, 0, 2],
-#                         [0, 0, 0, 0, 0, 0]])
-#
-# cost_matrix = np.ones((6, 6))
-# iteration = 100
-# ants = 6
-# nodes = 6
-#
-# ants = nodes = 6
 
-# initialization part
+def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta):
 
-# e = .5        # evaporation rate
-# alpha = 1     # pheromone factor
-# beta = 2      # visibility factor
+    cost_matrix = cost_matrix_object.cost_matrix
+    stops_label_dict = cost_matrix_object.stops_label_dict
+    start_nodes = cost_matrix_object.start_nodes
+    end_nodes = cost_matrix_object.end_nodes
 
-# calculating the visibility of the next city visibility(i,j) = 1/cost_matrix(i,j)
+    # FIXME consider multiple starting nodes
+    #  now we are taking into consideration only first possible start point
+    start = stops_label_dict[start_nodes[0]]
 
-# visibility = 1/cost_matrix
-# visibility[visibility == inf] = 0
-
-
-def aco_algorithm(num_iteration, start, end, ants, nodes, visibility, cost_matrix, e, alpha, beta):
-    # initializing pheromone present at the paths to the cities
-
+    possible_ends = [stops_label_dict[possible_end] for possible_end in end_nodes]
+    print(f"possible ends are: {possible_ends}")
+    # initializing pheromone present at the paths to stops
     pheromone = .1 * np.ones((ants, nodes))
 
     route_dict = {}
@@ -40,20 +23,19 @@ def aco_algorithm(num_iteration, start, end, ants, nodes, visibility, cost_matri
 
     for ite in range(num_iteration):
         print(f"{ite} iteration")
-        # initial starting position of every ants
-        route = [start]
 
         for i in range(ants):
 
+            # initial starting position of every ant
             route = [start]
 
             temp_visibility = np.array(visibility)  # creating a copy of visibility
 
             node = route[0]
 
-            while node != end:
-
-                cur_loc = int(node - 1)  # current node of the ant
+            while node not in possible_ends:
+                print(f"node is {node}")
+                cur_loc = node
 
                 temp_visibility[:, cur_loc] = 0  # making visibility of the current node equals zero
 
@@ -87,7 +69,7 @@ def aco_algorithm(num_iteration, start, end, ants, nodes, visibility, cost_matri
             route_cost = 0
             for counter, node in enumerate(route_dict[key][:-1]):
                 # calculating total tour distance
-                route_cost = route_cost + cost_matrix[int(node) - 1, int(route_dict[key][counter+1]) - 1]
+                route_cost = route_cost + cost_matrix[int(node) - 1, int(route_dict[key][counter+1]) - 1][0]
 
             dist_cost[key] = route_cost  # storing distance of tour for 'i'th ant at location 'i'
 
@@ -104,14 +86,3 @@ def aco_algorithm(num_iteration, start, end, ants, nodes, visibility, cost_matri
                 # updating the pheromone with delta distance (dt)
                 # dt will be greater when distance will be smaller
     return route_dict, best_route, dist_min_cost
-
-
-# if __name__ == "__main__":
-#     final_route_dict, final_best_route, final_dist_min_cost = aco_algorithm(iteration, START, END)
-#
-#     print(f"finding path from {START} to {END}")
-#     print('route of all the ants at the end :')
-#     for key_ in final_route_dict:
-#         print(f"{key_}: {final_route_dict[key_]}")
-#     print('best path :', final_best_route)
-#     print('cost of the best path', int(final_dist_min_cost[0]) + cost_matrix[int(final_best_route[-2]) - 1, 0])

@@ -1,0 +1,4 @@
+MobileZTM possible bugs:
+1) More than one possible start node
+2) To samo stopDesc - inne stopId ? (byc moze bedzie trzeba uzyc parametru subName)
+3) petla for w add_cost - tylko do góry
