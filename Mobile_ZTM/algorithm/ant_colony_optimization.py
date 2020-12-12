@@ -71,26 +71,30 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
 
             route_dict[i] = route
 
-        dist_cost = np.zeros((ants, 1))  # initializing total distance with zero
+        dist_cost = {}
 
         for key in route_dict:
-            route_cost = 0
+            route_cost = []
             for counter, node in enumerate(route_dict[key][:-1]):
                 # calculating total tour distance
-                route_cost = route_cost + int(cost_matrix[int(node)][int(route_dict[key][counter+1])][0])
+                route_cost.append(int(cost_matrix[int(node)][int(route_dict[key][counter+1])][0]))
 
             dist_cost[key] = route_cost  # storing distance of tour for 'i'th ant at location 'i'
 
-        dist_min_loc = np.argmin(dist_cost)  # finding location of minimum of dist_cost
-        dist_min_cost = dist_cost[dist_min_loc]  # finding min of dist_cost
+        dist_cost_sum = {key: sum(route_cost) for key, route_cost in dist_cost.items()}
+        dist_min_loc = np.argmin(dist_cost_sum)  # finding location of minimum of dist_cost
+
+        dist_min_cost = dist_cost_sum[dist_min_loc]  # finding min of dist_cost
+        dist_min_cost_arr = dist_cost[dist_min_loc]
 
         best_route = route_dict[dist_min_loc]  # initializing current traversed as best route
         pheromone = (1 - e) * pheromone  # evaporation of pheromone with (1-e)
 
         for key in route_dict:
             for counter, node in enumerate(route_dict[key][:-1]):
-                dt = 1 / dist_cost[key]
+                dt = 1 / dist_cost_sum[key]
                 pheromone[int(node), int(route_dict[key][counter+1])] += dt
                 # updating the pheromone with delta distance (dt)
                 # dt will be greater when distance will be smaller
-    return route_dict, best_route, dist_min_cost
+
+    return route_dict, best_route, dist_min_cost, dist_min_cost_arr

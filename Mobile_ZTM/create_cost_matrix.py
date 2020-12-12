@@ -291,27 +291,34 @@ for row in range(size):
 
 end = time.time()
 print(f"Creating cost matrix finished. Elapsed time: {end - start}")
-print(f"Cost matrix size: {size}")
+print(f"Cost matrix size: {size}x{size}")
 
 start = time.time()
 print("Started aco algorithm")
-# FIXME
-#  Change params of function to test algorithm
 
 # params
 # num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta
-final_route_dict, final_best_route, final_dist_min_cost = aco_algorithm(iteration, size, size, visibility,
-                                                                        cost_matrix_obj, e, alpha, beta)
+route_dict_, best_route_, dist_min_cost_, dist_min_costs_arr_ = aco_algorithm(iteration, size, size, visibility,
+                                                                              cost_matrix_obj, e, alpha, beta)
 
 print(f"Finding path from {USER_START} to {USER_END}")
 # print('route of all the ants at the end :')
-# for key_ in final_route_dict:
-#     print(f"{key_}: {final_route_dict[key_]}")
-print('Best path (labeled): ', final_best_route)
-print('Best path (unlabeled - format: routeID|stopID ): ')
-for node_label in final_best_route:
-    print(f"{list(stops_label_dict.keys())[list(stops_label_dict.values()).index(node_label)]} -> ", end='')
-print(f"\nfinal dist min cost: {final_dist_min_cost}")
-print('Cost of the best path', int(final_dist_min_cost[0]) + int(cost_matrix[int(final_best_route[-2]) - 1][0][0]))
+# for key_ in route_dict_:
+#     print(f"{key_}: {route_dict_[key_]}")
+print('Best path (labeled): ', best_route_)
+
+current_time = USER_TIME
+print('Best path (unlabeled): ')
+
+for counter, node_label in enumerate(best_route_):
+    key_label = list(stops_label_dict.keys())[list(stops_label_dict.values()).index(node_label)]
+    route_id = key_label[:key_label.find("|")]
+    stop_id = key_label[key_label.find("|") + 1:]
+    if counter:
+        current_time += timedelta(minutes=dist_min_costs_arr_[counter-1])
+    print(f"{counter}. Route: {route_id}, {Stop.objects.get(stopId=stop_id)}, time: {current_time}")
+
+print(f"Summed cost of the best path: {dist_min_cost_}")
+
 end = time.time()
 print(f"Algorithm finished. Elapsed time: {end - start}")
