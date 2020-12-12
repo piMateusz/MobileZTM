@@ -272,8 +272,7 @@ size = len(cost_matrix_obj.stops_label_dict)
 ants = nodes = size
 
 cost_matrix = cost_matrix_obj.cost_matrix
-
-print(f"stops label dict: {cost_matrix_obj.stops_label_dict}")
+stops_label_dict = cost_matrix_obj.stops_label_dict
 
 # initialization part
 
@@ -290,11 +289,9 @@ for row in range(size):
         if int(cost_matrix[row][col][0]):
             visibility[row][col] = 1 / int(cost_matrix[row][col][0])
 
-# np.set_printoptions(threshold=sys.maxsize)
-
 end = time.time()
 print(f"Creating cost matrix finished. Elapsed time: {end - start}")
-print(f" cost matrix size: {size}")
+print(f"Cost matrix size: {size}")
 
 start = time.time()
 print("Started aco algorithm")
@@ -306,11 +303,15 @@ print("Started aco algorithm")
 final_route_dict, final_best_route, final_dist_min_cost = aco_algorithm(iteration, size, size, visibility,
                                                                         cost_matrix_obj, e, alpha, beta)
 
-print(f"finding path from {USER_START} to {USER_END}")
-print('route of all the ants at the end :')
-for key_ in final_route_dict:
-    print(f"{key_}: {final_route_dict[key_]}")
-print('best path :', final_best_route)
-print('cost of the best path', int(final_dist_min_cost[0]) + cost_matrix[int(final_best_route[-2]) - 1][0][0])
+print(f"Finding path from {USER_START} to {USER_END}")
+# print('route of all the ants at the end :')
+# for key_ in final_route_dict:
+#     print(f"{key_}: {final_route_dict[key_]}")
+print('Best path (labeled): ', final_best_route)
+print('Best path (unlabeled - format: routeID|stopID ): ')
+for node_label in final_best_route:
+    print(f"{list(stops_label_dict.keys())[list(stops_label_dict.values()).index(node_label)]} -> ", end='')
+print(f"\nfinal dist min cost: {final_dist_min_cost}")
+print('Cost of the best path', int(final_dist_min_cost[0]) + int(cost_matrix[int(final_best_route[-2]) - 1][0][0]))
 end = time.time()
-print(f"algorithm finished. Elapsed time: {end - start}")
+print(f"Algorithm finished. Elapsed time: {end - start}")
