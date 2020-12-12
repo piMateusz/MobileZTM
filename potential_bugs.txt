@@ -1,4 +1,14 @@
 MobileZTM possible bugs:
+
 1) More than one possible start node
 2) To samo stopDesc - inne stopId ? (byc moze bedzie trzeba uzyc parametru subName)
-3) petla for w add_cost - tylko do góry
+
+4) handle situation when endpoint is unreachable
+	a) add walk_cost and connection from last_node to endpoint
+	b) back to start node and iterate again
+	c) check how far last_node is from endpoint. If within max_walk_time range - go to a), else - try to delete this branch
+	
+
+
+
+

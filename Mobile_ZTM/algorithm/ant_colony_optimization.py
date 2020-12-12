@@ -13,7 +13,7 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
     start = stops_label_dict[start_nodes[0]]
 
     possible_ends = [stops_label_dict[possible_end] for possible_end in end_nodes]
-    print(f"possible ends are: {possible_ends}")
+    print(f"possible ends are: {type(possible_ends[0])}")
     # initializing pheromone present at the paths to stops
     pheromone = .1 * np.ones((ants, nodes))
 
@@ -57,7 +57,7 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
                 r = np.random.random_sample()  # random number in [0,1)
 
                 # finding the next node having probability higher then random number (r)
-                node = np.nonzero(cumulative_probabilities > r)[0][0] + 1
+                node = np.nonzero(cumulative_probabilities > r)[0][0]
 
                 route.append(node)
 

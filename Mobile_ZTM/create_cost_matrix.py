@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from django.utils.timezone import make_aware
 from algorithm.constants import (STOPS_LIST_URL, ROUTES_URL, AVERAGE_HUMAN_SPEED, USER_DATE, USER_TIME,
                                  MAX_WALK_TIME, JSON_TIMETABLES_PATH, DATES_RANGE, USER_START, USER_END)
-
+# import sys
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Mobile_ZTM.settings')
 django.setup()
 
@@ -210,11 +210,8 @@ class CostMatrix:
                 self.start_nodes.append(str(timetable.route.routeId) + "|" + str(timetable.stop.stopId))
 
             last_route_stop_sequence = route_all_stops.last().stopSequence
-
             for stop_sequence in range(timetable.stopSequence, last_route_stop_sequence):
                 self.add_transport_costs_to_cost_dict(stop_sequence, route_all_stops, 1)
-            for stop_sequence in range(timetable.stopSequence, 0, -1):
-                self.add_transport_costs_to_cost_dict(stop_sequence, route_all_stops, -1)
 
     def add_transport_costs_to_cost_dict(self, stop_sequence, route_all_stops, step):
         current_stop_timetable = route_all_stops[stop_sequence]
@@ -232,7 +229,6 @@ class CostMatrix:
             self.stops_label_dict[str(stop_.route.routeId) + "|" + str(stop_.stop.stopId)] = self.cost_matrix_size
             self.cost_matrix_size += 1
             if stop_.stop.stopId == self.end_stop_id:
-                print(f"Endpoint {str(stop_.route.routeId) + '|' + str(stop_.stop.stopId)} added to end_nodes")
                 self.end_nodes.append(str(stop_.route.routeId) + "|" + str(stop_.stop.stopId))
 
     def add_walking_costs(self):
@@ -294,10 +290,11 @@ for row in range(size):
         if int(cost_matrix[row][col][0]):
             visibility[row][col] = 1 / int(cost_matrix[row][col][0])
 
+# np.set_printoptions(threshold=sys.maxsize)
+
 end = time.time()
 print(f"Creating cost matrix finished. Elapsed time: {end - start}")
 print(f" cost matrix size: {size}")
-print(f"visibility: {visibility}")
 
 start = time.time()
 print("Started aco algorithm")
