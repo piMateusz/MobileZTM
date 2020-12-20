@@ -20,6 +20,7 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
     route_dict = {}
     best_route = []
     dist_min_cost = 0
+    dist_min_cost_arr = []
 
     for ite in range(num_iteration):
 

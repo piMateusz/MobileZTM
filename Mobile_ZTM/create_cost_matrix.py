@@ -178,9 +178,11 @@ class CostMatrix:
         # FIXME
         #  mocked for test purposes
         if user_input == USER_START:
-            return 292
+            # return 292
+            return 201
         if user_input == USER_END:
-            return 2154
+            # return 2154
+            return 2231
 
     def convert_cost_dict_to_cost_matrix(self):
         self.cost_matrix = np.full((self.cost_matrix_size, self.cost_matrix_size, 2), [0, "transport unchanged"])
@@ -232,28 +234,19 @@ class CostMatrix:
                 self.end_nodes.append(str(stop_.route.routeId) + "|" + str(stop_.stop.stopId))
 
     def add_walking_costs(self):
+        # calculating euclidean distance
+        # distance = np.linalg.norm(stop_2_Id - stop_1_Id)
         pass
 
+        # stop_label_dict = {
+        #     "3|12": {"stopId": 12, "routeId": 3, "stopLat": 51.43243, "stopLon": 18.43242, "timeArrival": "1.1.2020"},
+        #     "5|111": {"stopId": 111, "routeId": 5, "stopLat": 11.43243, "stopLon": 15.43242, "timeArrival": "4.12.2020"
+        #               }
+        # }
+        #
+        # for stop_ in self.stop_label_dict:
+        #     print(f"stop id is {self.stop_label_dict[stop_]['stopId']}")
 
-# def add_walking_paths(cost_matrix):
-#     start = time.time()
-#     print("Starting add_walking_paths")
-#     for stop_1_Id in self.stops_label_dict:
-#         for stop_2_Id in self.stops_label_dict:
-#             if self.cost_matrix[self.stops_label_dict[stop_1_Id][0]][self.stops_label_dict[stop_2_Id][0]][0] == 0:
-#                 # passing stop coordinates to numpy arrays
-#                 stop_1_coords = np.array((self.stops_label_dict[stop_1_Id][1], self.stops_label_dict[stop_1_Id][2]))
-#                 stop_2_coords = np.array((self.stops_label_dict[stop_2_Id][1], self.stops_label_dict[stop_2_Id][2]))
-#                 # calculating euclidean distance
-#                 distance = np.linalg.norm(stop_2_Id - stop_1_Id)
-#                 # calculating time
-#                 time_ = distance/AVERAGE_HUMAN_SPEED
-#                 if time_ < MAX_WALK_TIME:
-#                     self.cost_matrix[self.stops_label_dict[stop_1_Id][0]][self.stops_label_dict[stop_2_Id][0]][0] = time_
-#                     self.cost_matrix[self.stops_label_dict[stop_1_Id][0]][self.stops_label_dict[stop_2_Id][0]][1] = "transport changed"
-#     end = time.time()
-#     print(f"add_walking_paths finished. Elapsed time: {end - start}")
-#     return cost_matrix
 
 # """ downloading stop, route and timetable databases for one day (today's date) """
 # date_ = get_today_date()
@@ -316,7 +309,7 @@ for counter, node_label in enumerate(best_route_):
     stop_id = key_label[key_label.find("|") + 1:]
     if counter:
         current_time += timedelta(minutes=dist_min_costs_arr_[counter-1])
-    print(f"{counter}. Route: {route_id}, {Stop.objects.get(stopId=stop_id)}, time: {current_time}")
+    print(f"{counter}. Route: {route_id}, {Stop.objects.get(stopId=stop_id)}, date: {USER_DATE.date()}, time: {current_time.time()}")
 
 print(f"Summed cost of the best path: {dist_min_cost_}")
 
