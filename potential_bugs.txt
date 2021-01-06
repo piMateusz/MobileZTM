@@ -2,7 +2,7 @@ MobileZTM possible bugs:
 
 1) More than one possible start node
 2) To samo stopDesc - inne stopId ? (byc moze bedzie trzeba uzyc parametru subName)
-
+3) jesli nie znaleziono zadnego polaczenia - sprobowac zwiekszyc MAX_WALK_TIME, MAX_WALK_DISTANCE i ponownie wywołac algorytm
 4) handle situation when endpoint is unreachable
 	a) add walk_cost and connection from last_node to endpoint
 	b) back to start node and iterate again

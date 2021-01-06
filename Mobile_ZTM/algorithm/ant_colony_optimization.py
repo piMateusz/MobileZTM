@@ -1,31 +1,45 @@
 import numpy as np
+from pyproj import Geod
+
+AVERAGE_HUMAN_SPEED = 5      # [km/h]
+AVERAGE_HUMAN_SPEED /= 60    # [km/min]
+AVERAGE_HUMAN_SPEED *= 1000  # [m/min]      = 83.(3) m/min
 
 
 def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta):
 
-    cost_matrix = cost_matrix_object.cost_matrix
+    geod = Geod(ellps="WGS84")
     stops_label_dict = cost_matrix_object.stops_label_dict
+    walking_label_dict = cost_matrix_object.walking_label_dict
     start_nodes = cost_matrix_object.start_nodes
     end_nodes = cost_matrix_object.end_nodes
-
-    # FIXME consider multiple starting nodes
-    #  now we are taking into consideration only first possible start point
-    start = stops_label_dict[start_nodes[0]]
-
-    possible_ends = [stops_label_dict[possible_end] for possible_end in end_nodes]
-
-    # initializing pheromone present at the paths to stops
-    pheromone = .1 * np.ones((ants, nodes))
-
+    print(end_nodes)
     route_dict = {}
     best_route = []
     dist_min_cost = 0
     dist_min_cost_arr = []
 
+    if not start_nodes:
+        return route_dict, best_route, dist_min_cost, dist_min_cost_arr
+
+    # FIXME consider multiple starting nodes
+    #  now we are taking into consideration only first possible start point
+    start = stops_label_dict[start_nodes[0]]["cost_matrix_label"]
+
+    possible_ends = [stops_label_dict[possible_end]["cost_matrix_label"] for possible_end in end_nodes if possible_end in stops_label_dict]
+    possible_ends.extend([walking_label_dict[possible_end]["cost_matrix_label"] for possible_end in end_nodes if possible_end in walking_label_dict])
+
+    # initializing pheromone present at the paths to stops
+    pheromone = .1 * np.ones((nodes, nodes))
+
     for ite in range(num_iteration):
-
+        # for purpose of arriving to endpoint no matter how far we ends
+        walk_dict = {}
+        walk_time = 0
+        endpoint_walk = 0
+        print(f"iteretion no: {ite}")
         for i in range(ants):
-
+            print(f"ant no: {i}")
             # initial starting position of every ant
             route = [start]
 
@@ -50,11 +64,21 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
                 # tries to search for food again
                 # FIXME - Replace with more efficient solution
                 if not np.any(combine_feature):
-                    # restarting ant node, route and temp_visibility
-                    route = [start]
-                    temp_visibility = np.array(visibility)  # creating a copy of visibility
-                    node = route[0]
-                    continue
+                    # adding walk path to first endnode
+                    last_stop_key_label = cost_matrix_object.find_label_dict_key_with_cost_matrix_label(node)
+                    endpoint_key_label = end_nodes[0]
+                    last_stop_label_dict = walking_label_dict if last_stop_key_label in walking_label_dict else stops_label_dict
+                    endpoint_label_dict = walking_label_dict if endpoint_key_label in walking_label_dict else stops_label_dict
+
+                    # calculating euclidean distance between 2 stops
+                    lons = [last_stop_label_dict[last_stop_key_label]["stop_lon"], endpoint_label_dict[endpoint_key_label]["stop_lon"]]
+                    lats = [last_stop_label_dict[last_stop_key_label]["stop_lat"], endpoint_label_dict[endpoint_key_label]["stop_lat"]]
+
+                    walk_distance = geod.line_length(lons, lats)
+
+                    # calculating average time to walk from stop1 to stop
+                    walk_time = walk_distance / AVERAGE_HUMAN_SPEED
+                    break
 
                 total = np.sum(combine_feature)  # sum of all the feature
 
@@ -69,8 +93,9 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
                 node = np.nonzero(cumulative_probabilities > r)[0][0]
 
                 route.append(node)
-
             route_dict[i] = route
+            if walk_time:
+                walk_dict[i] = walk_time
 
         dist_cost = {}
 
@@ -78,17 +103,23 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
             route_cost = []
             for counter, node in enumerate(route_dict[key][:-1]):
                 # calculating total tour distance
-                route_cost.append(int(cost_matrix[int(node)][int(route_dict[key][counter+1])][0]))
+                cost = cost_matrix_object.return_cost_matrix_cost(int(node), int(route_dict[key][counter+1]))
+                route_cost.append(cost)
 
+            if key in walk_dict:
+                route_cost.append(walk_dict[key])
             dist_cost[key] = route_cost  # storing distance of tour for 'i'th ant at location 'i'
 
         dist_cost_sum = {key: sum(route_cost) for key, route_cost in dist_cost.items()}
-        dist_min_loc = np.argmin(dist_cost_sum)  # finding location of minimum of dist_cost
+        dist_min_loc = min(dist_cost_sum, key=dist_cost_sum.get)  # finding location of minimum of dist_cost
 
         dist_min_cost = dist_cost_sum[dist_min_loc]  # finding min of dist_cost
-        dist_min_cost_arr = dist_cost[dist_min_loc]
 
         best_route = route_dict[dist_min_loc]  # initializing current traversed as best route
+        if dist_min_loc in walk_dict:
+            endpoint_walk = walk_dict[dist_min_loc]
+            print(f"key {dist_min_loc} in walk_dict, walk_time: {endpoint_walk}")
+
         pheromone = (1 - e) * pheromone  # evaporation of pheromone with (1-e)
 
         for key in route_dict:
@@ -98,4 +129,4 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
                 # updating the pheromone with delta distance (dt)
                 # dt will be greater when distance will be smaller
 
-    return route_dict, best_route, dist_min_cost, dist_min_cost_arr
+    return route_dict, best_route, dist_min_cost, endpoint_walk
