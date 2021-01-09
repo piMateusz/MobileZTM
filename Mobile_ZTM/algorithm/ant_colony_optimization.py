@@ -9,17 +9,17 @@ AVERAGE_HUMAN_SPEED *= 1000  # [m/min]      = 83.(3) m/min
 def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta):
 
     geod = Geod(ellps="WGS84")
+    cost_matrix = cost_matrix_object.cost_matrix
     stops_label_dict = cost_matrix_object.stops_label_dict
     walking_label_dict = cost_matrix_object.walking_label_dict
     start_nodes = cost_matrix_object.start_nodes
     end_nodes = cost_matrix_object.end_nodes
-    print(end_nodes)
     route_dict = {}
     best_route = []
     dist_min_cost = 0
     dist_min_cost_arr = []
 
-    if not start_nodes:
+    if not start_nodes or not end_nodes:
         return route_dict, best_route, dist_min_cost, dist_min_cost_arr
 
     # FIXME consider multiple starting nodes
@@ -31,15 +31,13 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
 
     # initializing pheromone present at the paths to stops
     pheromone = .1 * np.ones((nodes, nodes))
+    # for row in range(cost_matrix_object.cost_matrix_size):
+    #     for col in range(cost_matrix_object.cost_matrix_size):
+    #         if cost_matrix[row][col][1] == -1 and cost_matrix[row][col][0]:
+    #             pheromone[row][col] *= 5
 
     for ite in range(num_iteration):
-        # for purpose of arriving to endpoint no matter how far we ends
-        walk_dict = {}
-        walk_time = 0
-        endpoint_walk = 0
-        print(f"iteretion no: {ite}")
         for i in range(ants):
-            print(f"ant no: {i}")
             # initial starting position of every ant
             route = [start]
 
@@ -78,7 +76,17 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
 
                     # calculating average time to walk from stop1 to stop
                     walk_time = walk_distance / AVERAGE_HUMAN_SPEED
-                    break
+                    if walk_time > 100:
+                        # for route_node in route[-1:]:
+                        #     # delete non optimal graph branch
+                        #     pass
+                        route = [start]
+                        node = route[0]
+                        continue
+                    else:
+                        cost_matrix[node][possible_ends[0]] = [walk_time, 0]
+                        route.append(possible_ends[0])
+                        break
 
                 total = np.sum(combine_feature)  # sum of all the feature
 
@@ -93,9 +101,8 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
                 node = np.nonzero(cumulative_probabilities > r)[0][0]
 
                 route.append(node)
+
             route_dict[i] = route
-            if walk_time:
-                walk_dict[i] = walk_time
 
         dist_cost = {}
 
@@ -106,19 +113,15 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
                 cost = cost_matrix_object.return_cost_matrix_cost(int(node), int(route_dict[key][counter+1]))
                 route_cost.append(cost)
 
-            if key in walk_dict:
-                route_cost.append(walk_dict[key])
             dist_cost[key] = route_cost  # storing distance of tour for 'i'th ant at location 'i'
 
         dist_cost_sum = {key: sum(route_cost) for key, route_cost in dist_cost.items()}
+
         dist_min_loc = min(dist_cost_sum, key=dist_cost_sum.get)  # finding location of minimum of dist_cost
 
         dist_min_cost = dist_cost_sum[dist_min_loc]  # finding min of dist_cost
 
         best_route = route_dict[dist_min_loc]  # initializing current traversed as best route
-        if dist_min_loc in walk_dict:
-            endpoint_walk = walk_dict[dist_min_loc]
-            print(f"key {dist_min_loc} in walk_dict, walk_time: {endpoint_walk}")
 
         pheromone = (1 - e) * pheromone  # evaporation of pheromone with (1-e)
 
@@ -128,5 +131,8 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
                 pheromone[int(node), int(route_dict[key][counter+1])] += dt
                 # updating the pheromone with delta distance (dt)
                 # dt will be greater when distance will be smaller
-
-    return route_dict, best_route, dist_min_cost, endpoint_walk
+        if ite < 10:
+            print(f"iteration: {ite}, route_dict: {route_dict}")
+            print(f"iteration: {ite}, dist_cost_sum: {dist_cost_sum}")
+            print(f"iteration: {ite}, best route: {best_route}")
+    return route_dict, best_route, dist_min_cost, pheromone

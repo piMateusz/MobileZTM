@@ -3,6 +3,8 @@ import django
 import numpy as np
 import time
 import json
+import matplotlib.pyplot as plt
+import networkx as nx
 import concurrent.futures
 import requests
 from datetime import datetime, timedelta
@@ -291,6 +293,8 @@ class CostMatrix:
                                                   str(current_stop_timetable.stop.stopId)]["cost_matrix_label"]) + "+" + \
                         str(next_stop_label_dict[str(next_stop_timetable.route.routeId) + "|" +
                                                   str(next_stop_timetable.stop.stopId)]["cost_matrix_label"])
+        if not time_:
+            time_ = 1
         self.cost_dict[cost_dict_key] = [time_, -1]
 
     def add_stop_label(self, stop_, label_dict, key, walked_in=False):
@@ -376,24 +380,6 @@ class CostMatrix:
                 else:
                     summed_time = walk_time
 
-                # if stop_around_label_key in self.stops_label_dict or stop_around_label_key in self.walking_label_dict:
-                #     label_dict = self.walking_label_dict if stop_around_label_key in self.walking_label_dict else self.stops_label_dict
-                #     cost_dict_key = str(stop_dict["cost_matrix_label"]) + "+" + str(label_dict[stop_around_label_key]["cost_matrix_label"])
-                #     # dost_dict values are the same type as cost_matrix[row][col] values
-                #     cost_dict_cost = self.cost_dict[cost_dict_key][0]
-                #     # if we have wait_time value != -1
-                #     if self.cost_dict[cost_dict_key][1] != -1:
-                #         cost_dict_cost += self.cost_dict[cost_dict_key][1]
-                #
-                #     # if new cost (summed_time) is smaller then previous cost (cost_dict_cost)
-                #     # in one possible example if its faster to walk then ride
-                #     # then change cost of this node
-                #     if summed_time < cost_dict_cost:
-                #         print(f"summed time is {summed_time}, cost_dict_cost is {cost_dict_cost}")
-                #         self.cost_dict[cost_dict_key] = [walk_time, wait_time_]
-                #         self.stops_label_dict[stop_around_label_key]["walked_in"] = True
-
-                # else:
                 # adding new node to walking_label_dict
                 if stop_around_label_key not in self.stops_label_dict and stop_around_label_key not in self.walking_label_dict:
                     self.add_stop_label(stop_around, self.walking_label_dict, stop_around_label_key, walked_in=True)
@@ -417,12 +403,12 @@ cost_matrix_obj = CostMatrix(USER_DATE, USER_TIME, USER_START, USER_END)
 # create cost_matrix with maximum 1 change of transport
 cost_matrix_obj.create_cost_matrix(1)
 
-iteration = 50
+iteration = 25
 
 size = cost_matrix_obj.cost_matrix_size
 
 nodes = size
-ants = 50
+ants = 700
 
 cost_matrix = cost_matrix_obj.cost_matrix
 stops_label_dict = cost_matrix_obj.stops_label_dict
@@ -430,8 +416,8 @@ stops_label_dict = cost_matrix_obj.stops_label_dict
 # initialization part
 
 e = .5  # evaporation rate
-alpha = 1  # pheromone factor
-beta = 2  # visibility factor
+alpha = 2  # visibility factor
+beta = 1  # pheromone factor
 
 # calculating the visibility of the next city visibility(i,j) = 1/cost_matrix(i,j)
 
@@ -447,12 +433,51 @@ end = time.time()
 print(f"Creating cost matrix finished. Elapsed time: {end - start}")
 print(f"Cost matrix size: {size}x{size}")
 
+
+# Defining a Class
+# class GraphVisualization:
+#
+#     def __init__(self):
+#         # visual is a list which stores all
+#         # the set of edges that constitutes a
+#         # graph
+#         self.visual = []
+#
+#         # addEdge function inputs the vertices of an
+#
+#     # edge and appends it to the visual list
+#     def addEdge(self, a, b):
+#         temp = [a, b]
+#         self.visual.append(temp)
+#
+#         # In visualize function G is an object of
+#
+#     # class Graph given by networkx G.add_edges_from(visual)
+#     # creates a graph with a given list
+#     # nx.draw_networkx(G) - plots the graph
+#     # plt.show() - displays the graph
+#     def visualize(self):
+#         G = nx.Graph()
+#         G.add_edges_from(self.visual)
+#         nx.draw_networkx(G)
+#         plt.show()
+#
+#
+# graph_ = GraphVisualization()
+# for row in range(size):
+#     for col in range(size):
+#         cost = cost_matrix_obj.return_cost_matrix_cost(row, col)
+#         if cost:
+#             graph_.addEdge(row, col)
+#
+# graph_.visualize()
+
 start = time.time()
 print("Started aco algorithm")
 
 # params
 # num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta
-route_dict_, best_route_, dist_min_cost_, endpoint_walk = aco_algorithm(iteration, ants, nodes, visibility,
+route_dict_, best_route_, dist_min_cost_, pheromone_ = aco_algorithm(iteration, ants, nodes, visibility,
                                                          cost_matrix_obj, e, alpha, beta)
 # TODO check if route_dict is not useless
 print(f"Finding path from {USER_START} to {USER_END}")
@@ -490,13 +515,26 @@ else:
             print(f"{counter}. Route: {route_id}, {Stop.objects.get(stopId=stop_id)}, "
                   f"date: {USER_DATE.date()}, time: {current_time.time()}")
 
-    print(f"endpoint_walk time is: {endpoint_walk}")
-    print(f"endpoints are: ")
-    for key_label in cost_matrix_obj.end_nodes:
-        route_id = key_label[:key_label.find("|")]
-        stop_id = key_label[key_label.find("|") + 1:]
-        print(f"Route: {route_id}, {Stop.objects.get(stopId=stop_id)}, ")
     print(f"Summed cost of the best path: {dist_min_cost_}")
 
 end = time.time()
 print(f"Algorithm finished. Elapsed time: {end - start}")
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+xs = []
+ys = []
+zs = []
+
+for row in range(size):
+    for col in range(size):
+        xs.append(row)
+        ys.append(col)
+        zs.append(pheromone_[row][col])
+
+ax.scatter(xs, ys, zs)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Pheromone level')
+ax.set_title('Rozkład feromonów')
+plt.show()
