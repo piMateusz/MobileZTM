@@ -15,6 +15,7 @@ from algorithm.constants import (STOPS_LIST_URL, ROUTES_URL, AVERAGE_HUMAN_SPEED
                                  MAX_WALK_DISTANCE, JSON_TIMETABLES_PATH, DATES_RANGE, USER_START, USER_END,
                                  MAX_CHANGE_TIME, MAX_WAIT_TIME, LATS_DIFF, LON_DIFF)
 
+
 start = time.time()
 print("Started creating cost matrix")
 
@@ -139,22 +140,3 @@ else:
 
 end = time.time()
 print(f"Algorithm finished. Elapsed time: {end - start}")
-
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-xs = []
-ys = []
-zs = []
-
-for row in range(size):
-    for col in range(size):
-        xs.append(row)
-        ys.append(col)
-        zs.append(pheromone_[row][col])
-
-ax.scatter(xs, ys, zs)
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Pheromone level')
-ax.set_title('Rozkład feromonów')
-plt.show()

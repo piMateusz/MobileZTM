@@ -185,6 +185,13 @@ class CostMatrix:
     def return_cost_matrix_cost(self, row_, col_):
         return self.cost_matrix[row_][col_][0] if self.cost_matrix[row_][col_][1] == -1 else self.cost_matrix[row_][col_][0] + self.cost_matrix[row_][col_][1]
 
+    # returns cost_matrix[row] cost in list
+    def return_cost_matrix_cost_for_row(self, row):
+        row_costs = []
+        for col, _ in enumerate(self.cost_matrix[row]):
+            row_costs.append(self.return_cost_matrix_cost(row, col))
+        return row_costs
+
     @staticmethod
     def convert_user_input_to_stop_id(user_input):
         """ function returns stopId of stop equivalent to user input """
@@ -419,6 +426,9 @@ e = .5  # evaporation rate
 alpha = 2  # visibility factor
 beta = 1  # pheromone factor
 
+# number of pheromone plots (must be greater than 1!)
+display_num = 25
+
 # calculating the visibility of the next city visibility(i,j) = 1/cost_matrix(i,j)
 
 visibility = np.zeros((size, size))
@@ -477,8 +487,8 @@ print("Started aco algorithm")
 
 # params
 # num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta
-route_dict_, best_route_, dist_min_cost_, pheromone_ = aco_algorithm(iteration, ants, nodes, visibility,
-                                                         cost_matrix_obj, e, alpha, beta)
+route_dict_, best_route_, dist_min_cost_ = aco_algorithm(iteration, ants, nodes, visibility,
+                                                         cost_matrix_obj, e, alpha, beta, display_num)
 # TODO check if route_dict is not useless
 print(f"Finding path from {USER_START} to {USER_END}")
 # print('route of all the ants at the end :')
@@ -519,22 +529,3 @@ else:
 
 end = time.time()
 print(f"Algorithm finished. Elapsed time: {end - start}")
-
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-xs = []
-ys = []
-zs = []
-
-for row in range(size):
-    for col in range(size):
-        xs.append(row)
-        ys.append(col)
-        zs.append(pheromone_[row][col])
-
-ax.scatter(xs, ys, zs)
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Pheromone level')
-ax.set_title('Rozkład feromonów')
-plt.show()

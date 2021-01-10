@@ -1,12 +1,45 @@
 import numpy as np
 from pyproj import Geod
+import matplotlib.pyplot as plt
 
 AVERAGE_HUMAN_SPEED = 5      # [km/h]
 AVERAGE_HUMAN_SPEED /= 60    # [km/min]
 AVERAGE_HUMAN_SPEED *= 1000  # [m/min]      = 83.(3) m/min
 
 
-def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta):
+def display_pheromone(pheromone_, iterations, iteration_num, figures_num, size):
+    if figures_num <= 1:
+        print("Could not display pheromones properly.")
+        print(f"Invalid figures number: {figures_num}. Pick number bigger than 1")
+    else:
+        if figures_num > iterations:
+            figures_num = iterations
+        interval = iterations // (figures_num - 1)
+        display_iterations_ = [iter_ for iter_ in range(0, iterations + 1, interval)]
+        if interval != 1:
+            display_iterations_[0] = 1
+        if iteration_num in display_iterations_:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            xs = []
+            ys = []
+            zs = []
+
+            for row in range(size):
+                for col in range(size):
+                    xs.append(row)
+                    ys.append(col)
+                    zs.append(pheromone_[row][col])
+
+            ax.scatter(xs, ys, zs)
+            ax.set_xlabel('start_node')
+            ax.set_ylabel('end_node')
+            ax.set_zlabel('Pheromone level')
+            ax.set_title(f'Pheromone level in {iteration_num} iteration')
+            plt.show()
+
+
+def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta, display_num):
 
     geod = Geod(ellps="WGS84")
     cost_matrix = cost_matrix_object.cost_matrix
@@ -31,12 +64,14 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
 
     # initializing pheromone present at the paths to stops
     pheromone = .1 * np.ones((nodes, nodes))
-    # for row in range(cost_matrix_object.cost_matrix_size):
-    #     for col in range(cost_matrix_object.cost_matrix_size):
-    #         if cost_matrix[row][col][1] == -1 and cost_matrix[row][col][0]:
-    #             pheromone[row][col] *= 5
+
+    branches_deleted = 0
 
     for ite in range(num_iteration):
+
+        # plots pheromone levels
+        display_pheromone(pheromone, num_iteration, ite + 1, display_num, cost_matrix_object.cost_matrix_size)
+
         for i in range(ants):
             # initial starting position of every ant
             route = [start]
@@ -44,14 +79,13 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
             temp_visibility = np.array(visibility)  # creating a copy of visibility
 
             node = route[0]
-
             while node not in possible_ends:
                 cur_loc = node
 
                 temp_visibility[:, cur_loc] = 0  # making visibility of the current node equals zero
 
                 p_feature = np.power(pheromone[cur_loc, :], beta)  # calculating pheromone feature
-                v_feature = np.power(temp_visibility[cur_loc, :], alpha)  # calculating visibility feature
+                v_feature = np.power(visibility[cur_loc, :], alpha)  # calculating visibility feature
 
                 p_feature = p_feature[:, np.newaxis]  # adding axis to make a size[5,1]
                 v_feature = v_feature[:, np.newaxis]  # adding axis to make a size[5,1]
@@ -76,10 +110,25 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
 
                     # calculating average time to walk from stop1 to stop
                     walk_time = walk_distance / AVERAGE_HUMAN_SPEED
-                    if walk_time > 100:
-                        # for route_node in route[-1:]:
-                        #     # delete non optimal graph branch
-                        #     pass
+                    if walk_time > 30:
+                        # TODO - for every node - calculate walk time to check if we are not close enough to endpoint
+                        counter = len(route) - 2
+                        for route_node in reversed(route[1:]):
+                            # delete non optimal graph branch
+                            node_costs = cost_matrix_object.return_cost_matrix_cost_for_row(route_node)
+                            # if node does not have any other branches - delete it
+                            non_zero_cols_indexes = np.nonzero(node_costs)[0]       # returns list
+
+                            if len(non_zero_cols_indexes) == 0:
+                                cost_matrix_object.cost_matrix[route[counter]][route_node] = [0, -1]
+                                cost_matrix[route[counter]][route_node] = [0, -1]
+                                branches_deleted += 1
+                                visibility[route[counter]][route_node] = 0
+                                temp_visibility[route[counter]][route_node] = 0
+                                print(f"node {route[counter]}->{route_node} deleted, branches deleted: {branches_deleted}")
+                            else:
+                                break
+                            counter -= 1
                         route = [start]
                         node = route[0]
                         continue
@@ -92,7 +141,8 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
 
                 # finding probability of element probabilities(i) = combine_feature(i)/total
                 probabilities = combine_feature / total
-
+                # if not node:
+                #     print(f"probabils: {probabilities}")
                 cumulative_probabilities = np.cumsum(probabilities)  # calculating cumulative sum
 
                 r = np.random.random_sample()  # random number in [0,1)
@@ -131,8 +181,5 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
                 pheromone[int(node), int(route_dict[key][counter+1])] += dt
                 # updating the pheromone with delta distance (dt)
                 # dt will be greater when distance will be smaller
-        if ite < 10:
-            print(f"iteration: {ite}, route_dict: {route_dict}")
-            print(f"iteration: {ite}, dist_cost_sum: {dist_cost_sum}")
-            print(f"iteration: {ite}, best route: {best_route}")
-    return route_dict, best_route, dist_min_cost, pheromone
+
+    return route_dict, best_route, dist_min_cost
