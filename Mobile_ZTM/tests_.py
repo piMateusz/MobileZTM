@@ -24,7 +24,8 @@ cost_matrix_obj = CostMatrix(USER_DATE, USER_TIME, USER_START, USER_END)
 # create cost_matrix with maximum 1 change of transport
 cost_matrix_obj.create_cost_matrix(1)
 
-iteration = 25
+iteration = 50
+display_num = 25
 
 size = cost_matrix_obj.cost_matrix_size
 
@@ -98,8 +99,7 @@ print("Started aco algorithm")
 
 # params
 # num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta
-route_dict_, best_route_, dist_min_cost_, pheromone_ = aco_algorithm(iteration, ants, nodes, visibility,
-                                                         cost_matrix_obj, e, alpha, beta)
+route_dict_, best_route_, dist_min_cost_, = aco_algorithm(iteration, ants, nodes, visibility, cost_matrix_obj, e, alpha, beta, display_num)
 # TODO check if route_dict is not useless
 print(f"Finding path from {USER_START} to {USER_END}")
 # print('route of all the ants at the end :')
