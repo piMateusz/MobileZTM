@@ -200,13 +200,13 @@ class CostMatrix:
         # FIXME
         #  mocked for test purposes
         if user_input == USER_START:
-            return 292
+            # return 292
             # return 201
-            # return 8227
+            return 8227
         if user_input == USER_END:
-            return 2154
+            # return 2154
             # return 2231
-            # return 124
+            return 124
 
     def convert_cost_dict_to_cost_matrix(self):
         # cost_matrix[row][col][1] values:
@@ -415,7 +415,7 @@ iteration = 25
 size = cost_matrix_obj.cost_matrix_size
 
 nodes = size
-ants = 700
+ants = 2
 
 cost_matrix = cost_matrix_obj.cost_matrix
 stops_label_dict = cost_matrix_obj.stops_label_dict

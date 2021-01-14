@@ -27,10 +27,10 @@ def display_pheromone(pheromone_, iterations, iteration_num, figures_num, size):
 
             for row in range(size):
                 for col in range(size):
-                    if pheromone_[row][col] >= 0.1:
-                        xs.append(row)
-                        ys.append(col)
-                        zs.append(pheromone_[row][col])
+                    # if pheromone_[row][col] >= 0.1:
+                    xs.append(row)
+                    ys.append(col)
+                    zs.append(pheromone_[row][col])
 
             ax.scatter(xs, ys, zs)
             ax.set_xlabel('start_node')
@@ -95,7 +95,6 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
 
                 # checking if ant can go any further - if not - ant come back to start node and
                 # tries to search for food again
-                # FIXME - Replace with more efficient solution
                 if not np.any(combine_feature):
                     # adding walk path to first endnode
                     last_stop_key_label = cost_matrix_object.find_label_dict_key_with_cost_matrix_label(node)
