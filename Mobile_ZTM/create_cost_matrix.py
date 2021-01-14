@@ -200,13 +200,13 @@ class CostMatrix:
         # FIXME
         #  mocked for test purposes
         if user_input == USER_START:
-            # return 292
+            return 292
             # return 201
-            return 8227
+            # return 8227
         if user_input == USER_END:
-            # return 2154
+            return 2154
             # return 2231
-            return 124
+            # return 124
 
     def convert_cost_dict_to_cost_matrix(self):
         # cost_matrix[row][col][1] values:
@@ -445,42 +445,42 @@ print(f"Cost matrix size: {size}x{size}")
 
 
 # Defining a Class
-# class GraphVisualization:
-#
-#     def __init__(self):
-#         # visual is a list which stores all
-#         # the set of edges that constitutes a
-#         # graph
-#         self.visual = []
-#
-#         # addEdge function inputs the vertices of an
-#
-#     # edge and appends it to the visual list
-#     def addEdge(self, a, b):
-#         temp = [a, b]
-#         self.visual.append(temp)
-#
-#         # In visualize function G is an object of
-#
-#     # class Graph given by networkx G.add_edges_from(visual)
-#     # creates a graph with a given list
-#     # nx.draw_networkx(G) - plots the graph
-#     # plt.show() - displays the graph
-#     def visualize(self):
-#         G = nx.Graph()
-#         G.add_edges_from(self.visual)
-#         nx.draw_networkx(G)
-#         plt.show()
-#
-#
-# graph_ = GraphVisualization()
-# for row in range(size):
-#     for col in range(size):
-#         cost = cost_matrix_obj.return_cost_matrix_cost(row, col)
-#         if cost:
-#             graph_.addEdge(row, col)
-#
-# graph_.visualize()
+class GraphVisualization:
+
+    def __init__(self):
+        # visual is a list which stores all
+        # the set of edges that constitutes a
+        # graph
+        self.visual = []
+
+        # addEdge function inputs the vertices of an
+
+    # edge and appends it to the visual list
+    def addEdge(self, a, b):
+        temp = [a, b]
+        self.visual.append(temp)
+
+        # In visualize function G is an object of
+
+    # class Graph given by networkx G.add_edges_from(visual)
+    # creates a graph with a given list
+    # nx.draw_networkx(G) - plots the graph
+    # plt.show() - displays the graph
+    def visualize(self):
+        G = nx.Graph()
+        G.add_edges_from(self.visual)
+        nx.draw_networkx(G)
+        plt.show()
+
+
+graph_ = GraphVisualization()
+for row in range(size):
+    for col in range(size):
+        cost = cost_matrix_obj.return_cost_matrix_cost(row, col)
+        if cost:
+            graph_.addEdge(row, col)
+
+graph_.visualize()
 
 start = time.time()
 print("Started aco algorithm")
