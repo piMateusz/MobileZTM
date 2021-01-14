@@ -27,10 +27,10 @@ def display_pheromone(pheromone_, iterations, iteration_num, figures_num, size):
 
             for row in range(size):
                 for col in range(size):
-                    # if pheromone_[row][col] >= 0.1:
-                    xs.append(row)
-                    ys.append(col)
-                    zs.append(pheromone_[row][col])
+                    if pheromone_[row][col] >= 0.1:
+                        xs.append(row)
+                        ys.append(col)
+                        zs.append(pheromone_[row][col])
 
             ax.scatter(xs, ys, zs)
             ax.set_xlabel('start_node')
@@ -110,32 +110,32 @@ def aco_algorithm(num_iteration, ants, nodes, visibility, cost_matrix_object, e,
 
                     # calculating average time to walk from stop1 to stop
                     walk_time = walk_distance / AVERAGE_HUMAN_SPEED
-                    # if walk_time > 30:
-                    #     # TODO - for every node - calculate walk time to check if we are not close enough to endpoint
-                    #     counter = len(route) - 2
-                    #     for route_node in reversed(route[1:]):
-                    #         # delete non optimal graph branch
-                    #         node_costs = cost_matrix_object.return_cost_matrix_cost_for_row(route_node)
-                    #         # if node does not have any other branches - delete it
-                    #         non_zero_cols_indexes = np.nonzero(node_costs)[0]       # returns list
-                    #
-                    #         if len(non_zero_cols_indexes) == 0:
-                    #             cost_matrix_object.cost_matrix[route[counter]][route_node] = [0, -1]
-                    #             cost_matrix[route[counter]][route_node] = [0, -1]
-                    #             branches_deleted += 1
-                    #             visibility[route[counter]][route_node] = 0
-                    #             temp_visibility[route[counter]][route_node] = 0
-                    #             print(f"node {route[counter]}->{route_node} deleted, branches deleted: {branches_deleted}")
-                    #         else:
-                    #             break
-                    #         counter -= 1
-                    #     route = [start]
-                    #     node = route[0]
-                    #     continue
-                    # else:
-                    cost_matrix[node][possible_ends[0]] = [walk_time, 0]
-                    route.append(possible_ends[0])
-                    break
+                    if walk_time > 30:
+                    # TODO - for every node - calculate walk time to check if we are not close enough to endpoint
+                        counter = len(route) - 2
+                        for route_node in reversed(route[1:]):
+                            # delete non optimal graph branch
+                            node_costs = cost_matrix_object.return_cost_matrix_cost_for_row(route_node)
+                            # if node does not have any other branches - delete it
+                            non_zero_cols_indexes = np.nonzero(node_costs)[0]       # returns list
+
+                            if len(non_zero_cols_indexes) == 0:
+                                cost_matrix_object.cost_matrix[route[counter]][route_node] = [0, -1]
+                                cost_matrix[route[counter]][route_node] = [0, -1]
+                                branches_deleted += 1
+                                visibility[route[counter]][route_node] = 0
+                                temp_visibility[route[counter]][route_node] = 0
+                                print(f"node {route[counter]}->{route_node} deleted, branches deleted: {branches_deleted}")
+                            else:
+                                break
+                            counter -= 1
+                        route = [start]
+                        node = route[0]
+                        continue
+                    else:
+                        cost_matrix[node][possible_ends[0]] = [walk_time, 0]
+                        route.append(possible_ends[0])
+                        break
 
                 total = np.sum(combine_feature)  # sum of all the feature
 
