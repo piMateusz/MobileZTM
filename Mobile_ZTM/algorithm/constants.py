@@ -24,7 +24,7 @@ JSON_TIMETABLES_PATH = "https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4
 
 """------------------------------------------------------------------------------------------------------------------"""
 # First test
-# routeId = 3
+routeId = 3
 
 USER_DATE = datetime.datetime(2020, 12, 6)
 # data oznacza ze tego samego dnia
@@ -36,7 +36,7 @@ USER_END = "Węzeł Kliniczna"
 """------------------------------------------------------------------------------------------------------------------"""
 # Second test
 # routeId = 6
-
+#
 # USER_DATE = datetime.datetime(2020, 12, 6)
 # # data oznacza ze tego samego dnia
 # USER_TIME = make_aware(datetime.datetime(1899, 12, 30, 8, 56))
@@ -46,7 +46,7 @@ USER_END = "Węzeł Kliniczna"
 # USER_END = "Łostowice Świętokrzyska"
 """------------------------------------------------------------------------------------------------------------------"""
 # Third test
-# routeId = 3
+routeId = 3
 
 # USER_DATE = datetime.datetime(2020, 12, 6)
 # # data oznacza ze tego samego dnia
