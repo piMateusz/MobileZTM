@@ -410,12 +410,12 @@ cost_matrix_obj = CostMatrix(USER_DATE, USER_TIME, USER_START, USER_END)
 # create cost_matrix with maximum 1 change of transport
 cost_matrix_obj.create_cost_matrix(1)
 
-iteration = 5
+iteration = 25
 
 size = cost_matrix_obj.cost_matrix_size
 
 nodes = size
-ants = 14
+ants = 700
 
 cost_matrix = cost_matrix_obj.cost_matrix
 stops_label_dict = cost_matrix_obj.stops_label_dict
@@ -487,6 +487,13 @@ print("Started aco algorithm")
 
 # params
 # num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta
+# ants_num = [10,50,100,500,1000]
+# best_routes = []
+# for itern in ants_num:
+#     route_dict_, best_route_, dist_min_cost_ = aco_algorithm(iteration, itern, nodes, visibility,
+#                                                          cost_matrix_obj, e, alpha, beta, display_num)
+#     best_routes.append(dist_min_cost_)
+# print(best_routes)
 route_dict_, best_route_, dist_min_cost_ = aco_algorithm(iteration, ants, nodes, visibility,
                                                          cost_matrix_obj, e, alpha, beta, display_num)
 # TODO check if route_dict is not useless
