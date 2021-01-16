@@ -202,11 +202,13 @@ class CostMatrix:
         if user_input == USER_START:
             # return 292
             # return 201
-            return 8227
+            # return 8227
+            return 14610
         if user_input == USER_END:
             # return 2154
             # return 2231
-            return 124
+            # return 124
+            return 1488
 
     def convert_cost_dict_to_cost_matrix(self):
         # cost_matrix[row][col][1] values:
@@ -408,7 +410,7 @@ print("Started creating cost matrix")
 cost_matrix_obj = CostMatrix(USER_DATE, USER_TIME, USER_START, USER_END)
 
 # create cost_matrix with maximum 1 change of transport
-cost_matrix_obj.create_cost_matrix(1)
+cost_matrix_obj.create_cost_matrix(2)
 
 iteration = 25
 

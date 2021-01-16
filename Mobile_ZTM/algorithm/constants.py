@@ -25,6 +25,7 @@ JSON_TIMETABLES_PATH = "https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4
 """------------------------------------------------------------------------------------------------------------------"""
 # First test
 # routeId = 3
+# optimistic case
 #
 # USER_DATE = datetime.datetime(2020, 12, 6)
 # # data oznacza ze tego samego dnia
@@ -36,6 +37,7 @@ JSON_TIMETABLES_PATH = "https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4
 """------------------------------------------------------------------------------------------------------------------"""
 # Second test
 # routeId = 6
+# another optimistic case
 #
 # USER_DATE = datetime.datetime(2020, 12, 6)
 # # data oznacza ze tego samego dnia
@@ -46,12 +48,27 @@ JSON_TIMETABLES_PATH = "https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4
 # USER_END = "Łostowice Świętokrzyska"
 """------------------------------------------------------------------------------------------------------------------"""
 # Third test
-routeId = 3
+# routeId = 3
+# normal case (at least 1 change needed to reach endpoint)
+# approximate cost marix size 720x720
+#
+# USER_DATE = datetime.datetime(2020, 12, 6)
+# # data oznacza ze tego samego dnia
+# USER_TIME = make_aware(datetime.datetime(1899, 12, 30, 13, 22))
+# # start stopId = 8227
+# USER_START = 'Gdynia Dąbrowa Centrum'
+# # end stopId = 124
+# USER_END = "Zaspa SKM"
+"""------------------------------------------------------------------------------------------------------------------"""
+# Fourth test
+# routeId = 3
+# pessimistic case (at least 2 changes needed to reach endpoint)
+# approximate cost marix size 1550x1550
 
 USER_DATE = datetime.datetime(2020, 12, 6)
 # data oznacza ze tego samego dnia
-USER_TIME = make_aware(datetime.datetime(1899, 12, 30, 13, 22))
-# start stopId = 8227
-USER_START = 'Gdynia Dąbrowa Centrum'
-# end stopId = 124
-USER_END = "Zaspa SKM"
+USER_TIME = make_aware(datetime.datetime(1899, 12, 30, 11, 4))
+# start stopId = 14610
+USER_START = 'Kowale Osiedle Olimp'
+# end stopId = 1488
+USER_END = "Piastowska"
