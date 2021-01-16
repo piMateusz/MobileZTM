@@ -487,17 +487,24 @@ graph_.visualize()
 start = time.time()
 print("Started aco algorithm")
 
+ants_num = [10, 50, 100, 500, 1000]
+
+
+def create_plot(iterable):
+    best_routes = []
+    for itern in iterable:
+        route_dict_, best_route_, dist_min_cost_ = aco_algorithm(iteration, itern, nodes, visibility,
+                                                             cost_matrix_obj, e, alpha, beta, display_num)
+        best_routes.append(dist_min_cost_)
+    return best_routes
+
+# results = create_plot(ants_num)
+
 # params
 # num_iteration, ants, nodes, visibility, cost_matrix_object, e, alpha, beta
-# ants_num = [10,50,100,500,1000]
-# best_routes = []
-# for itern in ants_num:
-#     route_dict_, best_route_, dist_min_cost_ = aco_algorithm(iteration, itern, nodes, visibility,
-#                                                          cost_matrix_obj, e, alpha, beta, display_num)
-#     best_routes.append(dist_min_cost_)
-# print(best_routes)
 route_dict_, best_route_, dist_min_cost_ = aco_algorithm(iteration, ants, nodes, visibility,
-                                                         cost_matrix_obj, e, alpha, beta, display_num)
+                                                             cost_matrix_obj, e, alpha, beta, display_num)
+
 # TODO check if route_dict is not useless
 print(f"Finding path from {USER_START} to {USER_END}")
 # print('route of all the ants at the end :')
